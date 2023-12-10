@@ -11,9 +11,12 @@ const pauseMusic = new Audio("sons/pause.mp3")
 const startBtn = document.querySelector("#start-pause")
 const startBtnText = document.querySelector("#start-pause span")
 const startBtnImg = document.querySelector("#start-pause img")
-let timeDecorrido = 1500;
+let timeDecorrido = 1;
 let intervaloId = null;
 const timer = document.querySelector("#timer")
+
+
+
 
 timeBtn.forEach(btn => {
     let context = btn.getAttribute("data-contexto");
@@ -72,12 +75,17 @@ const contagemRegressiva = () => {
 
     if (timeDecorrido <= 0) {
         endMusic.play()
+        alert("Tempo Finalizado!")
+        if (htmlContext == "foco") {
+            const event = new CustomEvent("FocoFinalizado")
+            document.dispatchEvent(event)
+        }
         zerar()
-        alert("tempo finalizado")
         return
     }
-    mostrarTimer()
     timeDecorrido--
+    mostrarTimer()
+
 
 }
 
@@ -86,7 +94,6 @@ startBtn.addEventListener("click", iniciarPausar)
 function iniciarPausar() {
 
     if (intervaloId) {
-
         zerar()
         return
     }

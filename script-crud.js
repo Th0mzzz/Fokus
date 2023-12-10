@@ -1,11 +1,22 @@
 const btnAddTask = document.querySelector(".app__button--add-task")
 const formAddTask = document.querySelector(".app__form-add-task")
 const btnCancelAdd = document.querySelector(".app__form-footer__button--cancel")
+const btnRemoveComplete = document.querySelector("#btn-remover-concluidas")
+const btnRemoveAll = document.querySelector("#btn-remover-todas")
+
 const textArea = document.querySelector(".app__form-textarea")
 const ulTasks = document.querySelector(".app__section-task-list")
-const tasks = JSON.parse(localStorage.getItem("tasksStorage")) || []
+const pTask = document.querySelector(".app__section-active-task-description")
+let tasks = JSON.parse(localStorage.getItem("tasksStorage")) || []
 
-function attTasks(){
+let selectTask = null
+let liSelectTask = null
+
+
+
+
+
+function attTasks() {
     localStorage.setItem("tasksStorage", JSON.stringify(tasks))
 }
 btnAddTask.addEventListener("click", () => {
@@ -47,14 +58,14 @@ function createTask(task) {
     btn.classList.add("app_button-edit")
 
 
-    btn.onclick = () =>{
+    btn.onclick = () => {
         const newDesc = prompt('Qual o novo nome da tarefa?')
-        if(newDesc){
+        if (newDesc) {
             p.textContent = newDesc
             task.descricao = newDesc
             attTasks()
         }
-       
+
     }
 
     const imageBtn = document.createElement("img")
@@ -67,6 +78,30 @@ function createTask(task) {
     li.append(p)
     li.append(btn)
 
+    if (task.completa) {
+        li.classList.remove("app__section-task-list-item-active")
+        li.classList.add("app__section-task-list-item-complete")
+        btn.setAttribute("disabled", "disabled")
+    } else {
+        li.onclick = () => {
+
+            document.querySelectorAll(".app__section-task-list-item").forEach(item => {
+                item.classList.remove('app__section-task-list-item-active')
+            })
+
+            if (selectTask == task) {
+                pTask.textContent = ""
+                selectTask = null
+                liSelectTask = null
+                return
+            }
+
+            selectTask = task
+            liSelectTask = li
+            pTask.textContent = task.descricao
+            li.classList.add("app__section-task-list-item-active")
+        }
+    }
     return li
 }
 
@@ -75,3 +110,30 @@ tasks.forEach(tsk => {
     ulTasks.append(elementTask)
 });
 
+
+document.addEventListener("FocoFinalizado", () => {
+    if (selectTask && liSelectTask) {
+        liSelectTask.classList.remove("app__section-task-list-item-active")
+        liSelectTask.classList.add("app__section-task-list-item-complete")
+        liSelectTask.querySelector("button").setAttribute("disabled", "disabled")
+        selectTask.completa = true
+        attTasks()
+    }
+
+})
+
+btnRemoveComplete.addEventListener("click",()=> removerTasks(true) ) 
+btnRemoveAll.addEventListener("click", ()=> removerTasks(false) )
+
+function removerTasks(onlyComplete) {
+    let seletor = onlyComplete? ".app__section-task-list-item-complete":".app__section-task-list-item"
+
+    
+    document.querySelectorAll(seletor).forEach(tsk => {
+        tsk.remove()
+    })
+
+    tasks = onlyComplete? tasks.filter(tsk => !tsk.completa): []
+    attTasks()
+
+}

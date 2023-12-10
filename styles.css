@@ -432,7 +432,9 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: center;
     gap: 1rem;
 }
-
+.app__card-primary-button-icon{
+    max-width: 20px;
+}
 .app__footer {
     display: flex;
     width: 100%;
